@@ -1,97 +1,391 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f14" />
   <title>AdriLift</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    :root{
+      --bg:#0b0f14; --bg2:#101822; --card:#141d27; --card2:#1a2430; --text:#eef4ff;
+      --muted:#9aacbf; --line:#263240; --accent:#6ea8fe; --accent2:#8b5cf6;
+      --green:#22c55e; --orange:#f59e0b; --red:#ef4444; --shadow:0 14px 34px rgba(0,0,0,.28);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#090c11,#0d131a);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    body{min-height:100vh}
+    .app{max-width:1024px;margin:0 auto;padding:16px 14px 120px}
+    .topbar{
+      position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+      background:rgba(10,14,19,.74);border-bottom:1px solid rgba(255,255,255,.06);
+      margin:-16px -14px 16px;padding:14px 14px 12px;
+    }
+    .brand{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .title{font-size:30px;font-weight:900;letter-spacing:.2px}
+    .subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+    .week-chip{border:none;border-radius:999px;padding:10px 14px;font-weight:900;color:white;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--shadow)}
+    .nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+    .nav button{border:none;background:#151d27;color:var(--muted);padding:12px 10px;border-radius:14px;font-weight:900}
+    .nav button.active{color:white;background:linear-gradient(180deg,#223143,#1a2532);border:1px solid rgba(255,255,255,.08)}
+    .screen{display:none}.screen.active{display:block}
+    .hero{
+      background:radial-gradient(circle at top left, rgba(110,168,254,.16), transparent 38%),
+                 radial-gradient(circle at top right, rgba(139,92,246,.16), transparent 34%),
+                 linear-gradient(180deg,#141b24,#10161e);
+      border:1px solid rgba(255,255,255,.06);border-radius:28px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px
+    }
+    .hero-title{font-size:24px;font-weight:900}.hero-text{font-size:14px;line-height:1.5;color:var(--muted);margin-top:6px}
+    .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:14px}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}
+    @media (max-width:760px){.grid.two,.grid.three{grid-template-columns:1fr}}
+    .workout-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media (max-width:760px){.workout-cards{grid-template-columns:1fr}}
+    .workout-card{padding:16px;border-radius:20px;background:linear-gradient(180deg,#141c24,#0f151d);border:1px solid rgba(255,255,255,.06)}
+    .workout-card.active{outline:2px solid rgba(110,168,254,.4)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .row.space{justify-content:space-between}.stack{display:flex;flex-direction:column;gap:10px}
+    .label{font-size:12px;font-weight:900;color:var(--muted);margin-bottom:6px}
+    .muted{color:var(--muted)} .tiny{font-size:12px} .small{font-size:13px}
+    input,select,textarea{width:100%;background:#0f151c;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px 12px;outline:none;font-size:14px}
+    textarea{min-height:92px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:#4c6f98}
+    button{border:none;border-radius:14px;padding:12px 14px;font-weight:900;cursor:pointer}
+    .btn{background:#1f2937;color:white}.btn-outline{background:transparent;color:var(--text);border:1px solid var(--line)}
+    .btn-accent{background:linear-gradient(135deg,var(--accent),#4f8bf0);color:white}
+    .btn-purple{background:linear-gradient(135deg,var(--accent2),#6d4de8);color:white}
+    .btn-green{background:linear-gradient(135deg,var(--green),#16a34a);color:white}
+    .btn-orange{background:linear-gradient(135deg,var(--orange),#d97706);color:white}
+    .btn-red{background:linear-gradient(135deg,var(--red),#dc2626);color:white}
+    .btn-small{padding:8px 10px;border-radius:12px;font-size:12px}
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;background:#10161d;border:1px solid var(--line);color:var(--muted)}
+    .pill-green{background:#0d1d14;border-color:#1d5a34;color:#b9f5cc}
+    .pill-orange{background:#231707;border-color:#684712;color:#ffdfaa}
+    .pill-red{background:#230d0d;border-color:#6d2525;color:#ffc0c0}
+    .progress{height:10px;border-radius:999px;background:#0d1318;border:1px solid var(--line);overflow:hidden}.progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+    .countdown{font-size:40px;font-weight:900;letter-spacing:.4px}
+    .exercise{border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,#131a22,#0f151c);border-radius:22px;padding:14px;margin-top:14px}
+    .exercise-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .alt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media (max-width:760px){.alt-grid{grid-template-columns:1fr}}
+    .set-row{display:grid;grid-template-columns:58px 90px 1fr auto;gap:8px;align-items:start;margin-bottom:8px}
+    @media (max-width:760px){.set-row{grid-template-columns:54px 88px 1fr}.set-actions{grid-column:1/-1}}
+    .set-label{padding:10px 8px;border-radius:12px;background:#0f151c;border:1px solid var(--line);font-weight:900;text-align:center}
+    .diff{font-size:12px;color:var(--muted);margin-top:2px}
+    .color-wrap{display:flex;gap:6px;align-items:center;justify-content:flex-end}
+    .cbtn{width:28px;height:28px;border-radius:999px;border:2px solid transparent;opacity:.55}
+    .cbtn.active{opacity:1;transform:scale(1.05)}
+    .cbtn.red{background:var(--red)} .cbtn.orange{background:var(--orange)} .cbtn.green{background:var(--green)}
+    .divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
+    .danger-zone{border:1px solid rgba(239,68,68,.25);background:rgba(127,29,29,.10);border-radius:18px;padding:14px}
+    .footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+    .helper{font-size:12px;color:var(--muted)}
+  </style>
 </head>
-
-<body style="background:black;color:white;font-family:sans-serif;padding:20px;">
-
-<h1>AdriLift</h1>
-
-<h2 id="week">Week 1</h2>
-
-<h2>Timer</h2>
-<div id="timer" style="font-size:30px;">60:00</div>
-<button onclick="start()">Start Training</button>
-
-<h2>Exercises</h2>
-<div id="exercises"></div>
-
-<button onclick="addExercise()">+ Add Exercise</button>
-
-<br><br>
-<button onclick="finish()">Finish Workout</button>
-
-<br><br>
-<button onclick="reset()" style="background:red;color:white;">RESET</button>
-
+<body>
+<div id="app" class="app"></div>
 <script>
-let time = 3600;
-let running = false;
-let week = localStorage.getItem("week") || 1;
-
-document.getElementById("week").innerText = "Week " + week;
-
-function start() {
-  running = true;
-}
-
-setInterval(() => {
-  if (!running) return;
-  if (time > 0) time--;
-  let m = Math.floor(time/60);
-  let s = time % 60;
-  document.getElementById("timer").innerText =
-    m + ":" + (s<10?"0"+s:s);
-}, 1000);
-
-function addExercise(){
-  let div = document.createElement("div");
-
-  div.innerHTML = `
-    <input placeholder="Exercise name"><br>
-    <div class="sets"></div>
-    <button onclick="addSet(this)">+ Add Set</button>
-    <hr>
-  `;
-
-  document.getElementById("exercises").appendChild(div);
-}
-
-function addSet(btn){
-  let parent = btn.parentElement;
-  let setsDiv = parent.querySelector(".sets");
-
-  let set = document.createElement("div");
-
-  set.innerHTML = `
-    <input placeholder="Reps">
-    <input placeholder="KG">
-    <select>
-      <option value="">-</option>
-      <option value="red">Hard</option>
-      <option value="orange">Good</option>
-      <option value="green">Easy</option>
-    </select>
-  `;
-
-  setsDiv.appendChild(set);
-}
-
-function finish(){
-  localStorage.setItem("week", ++week);
-  alert("Workout saved ✅");
-  location.reload();
-}
-
-function reset(){
-  if(confirm("Are you sure?")){
-    localStorage.clear();
-    location.reload();
+const STORAGE_KEY = "adrilift_full_v1";
+function uid(){return Math.random().toString(36).slice(2,10);}
+function emptySet(){return {reps:"",weight:"",feeling:""};}
+function emptyExercise(){return {id:uid(),name:"",alternatives:["","",""],activeVariant:0,setType:"normal",supersetWith:"",sets:[emptySet(),emptySet(),emptySet(),emptySet()],note:""};}
+function emptyTraining(trainingNumber=1){return {trainingNumber,muscleGroups:"",notes:"",durationSec:0,finishedAt:"",timerState:{remainingSec:3600,running:false},exercises:[]};}
+function emptyWeek(weekNumber){return {weekNumber,trainings:{1:emptyTraining(1),2:emptyTraining(2),3:emptyTraining(3),4:emptyTraining(4)}};}
+function initialState(){return {appName:"AdriLift",currentScreen:"dashboard",currentWeek:1,currentTraining:1,baselineWeek:1,weeks:{1:emptyWeek(1)}};}
+function deepClone(v){return JSON.parse(JSON.stringify(v));}
+function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state));}
+function normalize(s){
+  const x={...initialState(),...s};
+  if(!x.weeks || typeof x.weeks !== "object") x.weeks={1:emptyWeek(1)};
+  for(let w=1; w<=52; w++){
+    if(!x.weeks[w]) continue;
+    for(let t=1;t<=4;t++){
+      if(!x.weeks[w].trainings[t]) x.weeks[w].trainings[t]=emptyTraining(t);
+      const tr=x.weeks[w].trainings[t];
+      if(!tr.timerState) tr.timerState={remainingSec:3600,running:false};
+      if(!Array.isArray(tr.exercises)) tr.exercises=[];
+      tr.exercises=tr.exercises.map(ex=>({
+        ...emptyExercise(), ...ex,
+        alternatives:Array.isArray(ex.alternatives)?[ex.alternatives[0]||"",ex.alternatives[1]||"",ex.alternatives[2]||""]:["","",""],
+        sets:Array.isArray(ex.sets)&&ex.sets.length?ex.sets.map(s=>({...emptySet(),...s})):[emptySet(),emptySet(),emptySet(),emptySet()]
+      }));
+    }
   }
+  return x;
 }
-</script>
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return initialState(); return normalize(JSON.parse(raw));}catch(e){return initialState();}}
+function escapeHtml(v){return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");}
+let state=load();
+function ensureWeek(week){if(!state.weeks[week]) state.weeks[week]=emptyWeek(week);}
+function isTrainingBlank(tr){return !tr.muscleGroups && !tr.notes && !tr.finishedAt && (!tr.exercises || tr.exercises.length===0);}
+function maybePrefill(week,training){
+  ensureWeek(week); const current=state.weeks[week].trainings[training];
+  if(week<=1 || !isTrainingBlank(current)) return;
+  const prevWeek=state.weeks[week-1]; if(!prevWeek) return;
+  const prevTraining=prevWeek.trainings[training]; if(!prevTraining) return;
+  const copy=deepClone(prevTraining); copy.finishedAt=""; copy.durationSec=0; copy.timerState={remainingSec:3600,running:false};
+  state.weeks[week].trainings[training]=copy;
+}
+function getTraining(week=state.currentWeek,training=state.currentTraining){ensureWeek(week); maybePrefill(week,training); return state.weeks[week].trainings[training];}
+function setWeek(w){state.currentWeek=Math.min(52,Math.max(1,Number(w))); ensureWeek(state.currentWeek); maybePrefill(state.currentWeek,state.currentTraining); save(); render();}
+function setTraining(t){state.currentTraining=Number(t); maybePrefill(state.currentWeek,state.currentTraining); save(); render();}
+function completedCount(week){ensureWeek(week); let c=0; for(let t=1;t<=4;t++) if(state.weeks[week].trainings[t].finishedAt) c++; return c;}
+function progressPercent(week){return (completedCount(week)/4)*100;}
+function formatTime(sec){sec=Math.max(0,sec); const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60; if(h>0) return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; return `${m}:${String(s).padStart(2,"0")}`;}
+function diffText(currentVal, compareVal, suffix=""){const a=Number(currentVal), b=Number(compareVal); if(!Number.isFinite(a)||!Number.isFinite(b)) return "—"; const d=a-b; return `${d>0?"+":""}${d}${suffix}`;}
+function findPrevValue(field,exIndex,setIndex){if(state.currentWeek<=1) return null; const prevWeek=state.weeks[state.currentWeek-1]; if(!prevWeek) return null; const tr=prevWeek.trainings[state.currentTraining]; if(!tr||!tr.exercises[exIndex]||!tr.exercises[exIndex].sets[setIndex]) return null; return tr.exercises[exIndex].sets[setIndex][field];}
+function findBaseValue(field,exIndex,setIndex){const base=state.weeks[state.baselineWeek]; if(!base) return null; const tr=base.trainings[state.currentTraining]; if(!tr||!tr.exercises[exIndex]||!tr.exercises[exIndex].sets[setIndex]) return null; return tr.exercises[exIndex].sets[setIndex][field];}
+function weekOptions(selected){let out=""; for(let i=1;i<=52;i++) out+=`<option value="${i}" ${selected===i?"selected":""}>Week ${i}</option>`; return out;}
+function exerciseOptions(selected, includeEmpty=false){
+  const tr=getTraining(); let out=includeEmpty?`<option value="">Select exercise</option>`:"";
+  for(let i=1;i<=tr.exercises.length;i++) out+=`<option value="${i}" ${String(selected)===String(i)?"selected":""}>Exercise ${i}</option>`;
+  return out;
+}
+function startTraining(){const tr=getTraining(); tr.timerState.running=true; save(); render();}
+function pauseTraining(){const tr=getTraining(); tr.timerState.running=false; save(); render();}
+function resetTimer(){const tr=getTraining(); tr.timerState.running=false; tr.timerState.remainingSec=3600; save(); render();}
+function finishWorkout(){const tr=getTraining(); tr.timerState.running=false; tr.finishedAt=new Date().toISOString(); tr.durationSec=3600-tr.timerState.remainingSec; save(); alert("Workout saved ✅"); render();}
+function updateTrainingField(field,value){const tr=getTraining(); tr[field]=value; save();}
+function addExercise(){const tr=getTraining(); if(tr.exercises.length>=10){alert("Maximum is 10 exercises."); return;} tr.exercises.push(emptyExercise()); save(); render();}
+function removeExercise(i){const tr=getTraining(); tr.exercises.splice(i,1); tr.exercises.forEach(ex=>{if(ex.supersetWith && Number(ex.supersetWith)>tr.exercises.length) ex.supersetWith="";}); save(); render();}
+function updateExerciseField(i,field,value){const tr=getTraining(); tr.exercises[i][field]=value; save();}
+function updateAlternative(i,altI,value){const tr=getTraining(); tr.exercises[i].alternatives[altI]=value; save();}
+function setActiveVariant(i,variant){const tr=getTraining(); tr.exercises[i].activeVariant=variant; save(); render();}
+function addSet(i){const tr=getTraining(); tr.exercises[i].sets.push(emptySet()); save(); render();}
+function removeSet(i,si){const tr=getTraining(); if(tr.exercises[i].sets.length<=1) return; tr.exercises[i].sets.splice(si,1); save(); render();}
+function updateSet(i,si,field,value){const tr=getTraining(); tr.exercises[i].sets[si][field]=value; save();}
+function activeExerciseName(ex){if(ex.activeVariant===0) return ex.name || "Main exercise"; return ex.alternatives[ex.activeVariant-1] || `Alternative ${ex.activeVariant}`;}
+function copyFromPreviousWeek(){
+  if(state.currentWeek<=1){alert("Week 1 has no previous week."); return;}
+  const prev=state.weeks[state.currentWeek-1]; if(!prev){alert("No previous week found."); return;}
+  state.weeks[state.currentWeek].trainings[state.currentTraining]=deepClone(prev.trainings[state.currentTraining]);
+  const tr=state.weeks[state.currentWeek].trainings[state.currentTraining]; tr.finishedAt=""; tr.durationSec=0; tr.timerState={remainingSec:3600,running:false}; save(); render();
+}
+function safeReset(){const typed=prompt('Type RESET to delete all weeks.'); if(typed==="RESET"){localStorage.removeItem(STORAGE_KEY); state=initialState(); render();} else if(typed!==null){alert("Reset cancelled.");}}
+function go(screen){state.currentScreen=screen; save(); render();}
+function renderSetRow(ex, exIndex, set, setIndex){
+  return `
+    <div class="set-row">
+      <div class="set-label">#${setIndex+1}</div>
+      <div class="stack">
+        <input type="number" inputmode="numeric" placeholder="Reps" value="${set.reps ?? ""}" oninput="updateSet(${exIndex}, ${setIndex}, 'reps', this.value)">
+        <div class="diff">vs last: ${diffText(set.reps, findPrevValue('reps', exIndex, setIndex), ' reps')} · vs W1: ${diffText(set.reps, findBaseValue('reps', exIndex, setIndex), ' reps')}</div>
+      </div>
+      <div class="stack">
+        <input type="number" inputmode="decimal" placeholder="KG" value="${set.weight ?? ""}" oninput="updateSet(${exIndex}, ${setIndex}, 'weight', this.value)">
+        <div class="diff">vs last: ${diffText(set.weight, findPrevValue('weight', exIndex, setIndex), ' kg')} · vs W1: ${diffText(set.weight, findBaseValue('weight', exIndex, setIndex), ' kg')}</div>
+      </div>
+      <div class="set-actions row" style="justify-content:flex-end">
+        <div class="color-wrap">
+          <button class="cbtn red ${set.feeling==='hard'?'active':''}" onclick="updateSet(${exIndex}, ${setIndex}, 'feeling', 'hard'); render()"></button>
+          <button class="cbtn orange ${set.feeling==='good'?'active':''}" onclick="updateSet(${exIndex}, ${setIndex}, 'feeling', 'good'); render()"></button>
+          <button class="cbtn green ${set.feeling==='easy'?'active':''}" onclick="updateSet(${exIndex}, ${setIndex}, 'feeling', 'easy'); render()"></button>
+        </div>
+        <button class="btn-outline btn-small" onclick="removeSet(${exIndex}, ${setIndex})">Remove</button>
+      </div>
+    </div>`;
+}
+function renderDashboard(){
+  return `
+    <div class="hero">
+      <div class="hero-title">Train smarter, not random.</div>
+      <div class="hero-text">4 workouts per week, 52 weeks of history, week-to-week comparison, timer, alternatives, notes, colors, supersets and drop sets.</div>
+    </div>
+    <div class="card">
+      <div class="row space">
+        <div><h3 style="margin:0">Current Week</h3><div class="muted">Week ${state.currentWeek}</div></div>
+        <div class="badge">${completedCount(state.currentWeek)}/4 completed</div>
+      </div>
+      <div class="progress" style="margin-top:12px"><div style="width:${progressPercent(state.currentWeek)}%"></div></div>
+    </div>
+    <div class="workout-cards" style="margin-top:14px">
+      ${[1,2,3,4].map(t=>{
+        const tr=getTraining(state.currentWeek,t), done=!!tr.finishedAt;
+        return `<div class="workout-card ${state.currentTraining===t?'active':''}">
+          <div class="row space">
+            <div><div class="tiny muted">Week ${state.currentWeek}</div><div style="font-size:22px;font-weight:900">Training ${t}</div></div>
+            <div class="badge ${done?'pill-green':''}">${done?'Completed':'Pending'}</div>
+          </div>
+          <div class="muted small" style="margin-top:10px">${tr.muscleGroups ? escapeHtml(tr.muscleGroups) : 'No muscle groups yet'}</div>
+          <div class="row" style="margin-top:14px"><button class="btn-accent" onclick="setTraining(${t}); go('workout')">Open</button></div>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+function renderWorkout(){
+  const tr=getTraining();
+  return `
+    <div class="card">
+      <div class="grid two">
+        <div><div class="label">Week</div><select onchange="setWeek(this.value)">${weekOptions(state.currentWeek)}</select></div>
+        <div><div class="label">Training</div><select onchange="setTraining(this.value)"><option value="1" ${state.currentTraining===1?'selected':''}>Training 1</option><option value="2" ${state.currentTraining===2?'selected':''}>Training 2</option><option value="3" ${state.currentTraining===3?'selected':''}>Training 3</option><option value="4" ${state.currentTraining===4?'selected':''}>Training 4</option></select></div>
+      </div>
+      <div class="row space" style="margin-top:14px">
+        <div><div class="tiny muted">Current session</div><div style="font-size:24px;font-weight:900">Week ${state.currentWeek} · Training ${state.currentTraining}</div></div>
+        <div class="badge ${tr.finishedAt?'pill-green':''}">${tr.finishedAt?'Finished':'In progress'}</div>
+      </div>
+      <div class="grid two" style="margin-top:14px">
+        <div><div class="label">Muscle groups</div><input placeholder="Example: Grudi, ramena, triceps" value="${escapeHtml(tr.muscleGroups)}" oninput="updateTrainingField('muscleGroups', this.value)"></div>
+        <div>
+          <div class="label">Workout timer</div>
+          <div class="card" style="padding:14px;background:#0f151c">
+            <div class="countdown">${formatTime(tr.timerState.remainingSec)}</div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn-green" onclick="startTraining()">Start</button>
+              <button class="btn-orange" onclick="pauseTraining()">Pause</button>
+              <button class="btn-outline" onclick="resetTimer()">Reset Timer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid two" style="margin-top:14px">
+        <div><div class="label">Workout notes</div><textarea placeholder="How did the session feel?" oninput="updateTrainingField('notes', this.value)">${escapeHtml(tr.notes)}</textarea></div>
+        <div>
+          <div class="label">Quick actions</div>
+          <div class="stack">
+            <button class="btn-outline" onclick="copyFromPreviousWeek()">Copy same training from previous week</button>
+            <button class="btn-accent" onclick="addExercise()">+ Add Exercise</button>
+            <button class="btn-green" onclick="finishWorkout()">Finish Workout</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    ${tr.exercises.length===0 ? `<div class="card" style="margin-top:14px"><h3>No exercises yet</h3><div class="muted">Tap “Add Exercise” to build this workout.</div></div>` : ""}
+
+    ${tr.exercises.map((ex,i)=>`
+      <div class="exercise">
+        <div class="exercise-head">
+          <div style="flex:1;min-width:220px">
+            <div class="label">Exercise ${i+1}</div>
+            <input placeholder="Exercise name" value="${escapeHtml(ex.name)}" oninput="updateExerciseField(${i}, 'name', this.value)">
+            <div class="row" style="margin-top:10px">
+              <div class="badge">Active: ${escapeHtml(activeExerciseName(ex))}</div>
+              ${ex.setType==='dropset' ? `<div class="badge pill-orange">Drop set</div>` : ""}
+              ${ex.setType==='superset' ? `<div class="badge pill-green">Superset${ex.supersetWith ? ' with #' + ex.supersetWith : ''}</div>` : ""}
+            </div>
+          </div>
+          <button class="btn-red btn-small" onclick="removeExercise(${i})">Delete</button>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <div class="label">Set type</div>
+            <select onchange="updateExerciseField(${i}, 'setType', this.value); render()">
+              <option value="normal" ${ex.setType==='normal'?'selected':''}>Normal</option>
+              <option value="superset" ${ex.setType==='superset'?'selected':''}>Superset</option>
+              <option value="dropset" ${ex.setType==='dropset'?'selected':''}>Drop set</option>
+            </select>
+          </div>
+          <div>
+            <div class="label">Superset with</div>
+            <select ${ex.setType!=='superset'?'disabled':''} onchange="updateExerciseField(${i}, 'supersetWith', this.value)">
+              ${exerciseOptions(ex.supersetWith, true)}
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="label">Alternative exercises</div>
+          <div class="alt-grid">
+            <input placeholder="Alternative 1" value="${escapeHtml(ex.alternatives[0])}" oninput="updateAlternative(${i}, 0, this.value)">
+            <input placeholder="Alternative 2" value="${escapeHtml(ex.alternatives[1])}" oninput="updateAlternative(${i}, 1, this.value)">
+            <input placeholder="Alternative 3" value="${escapeHtml(ex.alternatives[2])}" oninput="updateAlternative(${i}, 2, this.value)">
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn-small ${ex.activeVariant===0?'btn-accent':'btn-outline'}" onclick="setActiveVariant(${i},0)">Use Main</button>
+            <button class="btn-small ${ex.activeVariant===1?'btn-accent':'btn-outline'}" onclick="setActiveVariant(${i},1)">Use Alt 1</button>
+            <button class="btn-small ${ex.activeVariant===2?'btn-accent':'btn-outline'}" onclick="setActiveVariant(${i},2)">Use Alt 2</button>
+            <button class="btn-small ${ex.activeVariant===3?'btn-accent':'btn-outline'}" onclick="setActiveVariant(${i},3)">Use Alt 3</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="row space">
+          <h4 style="margin:0">Sets</h4>
+          <button class="btn-outline btn-small" onclick="addSet(${i})">+ Add Set</button>
+        </div>
+        <div style="margin-top:12px">${ex.sets.map((set,si)=>renderSetRow(ex,i,set,si)).join("")}</div>
+
+        <div style="margin-top:12px">
+          <div class="label">Exercise note</div>
+          <textarea placeholder="Optional note for this exercise" oninput="updateExerciseField(${i}, 'note', this.value)">${escapeHtml(ex.note||"")}</textarea>
+        </div>
+      </div>
+    `).join("")}
+  `;
+}
+function renderHistory(){
+  const weeks=Object.values(state.weeks).filter(w=>w&&w.weekNumber).sort((a,b)=>a.weekNumber-b.weekNumber);
+  return `
+    <div class="card"><h3>Year overview</h3><div class="muted">You can store up to 52 weeks of training history on this device.</div></div>
+    <div class="grid" style="margin-top:14px">
+      ${weeks.map(w=>{
+        const completed=completedCount(w.weekNumber);
+        const totalMin=Math.round(([1,2,3,4].map(t=>w.trainings[t].durationSec||0).reduce((a,b)=>a+b,0))/60);
+        return `<div class="card">
+          <div class="row space">
+            <div><div style="font-size:20px;font-weight:900">Week ${w.weekNumber}</div><div class="muted small">${completed}/4 workouts completed</div></div>
+            <button class="btn-outline btn-small" onclick="setWeek(${w.weekNumber}); go('dashboard')">Open</button>
+          </div>
+          <div class="progress" style="margin-top:12px"><div style="width:${progressPercent(w.weekNumber)}%"></div></div>
+          <div class="row" style="margin-top:12px">
+            ${[1,2,3,4].map(t=>`<div class="badge ${w.trainings[t].finishedAt?'pill-green':''}">T${t}: ${w.trainings[t].finishedAt?'done':'pending'}</div>`).join("")}
+          </div>
+          <div class="muted small" style="margin-top:10px">Total saved duration: ${totalMin} min</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+function renderSettings(){
+  return `
+    <div class="card">
+      <h3>Settings</h3>
+      <div class="muted">Safe controls for your app data.</div>
+      <div class="grid two" style="margin-top:14px">
+        <div><div class="label">App name</div><input value="${escapeHtml(state.appName)}" oninput="state.appName=this.value; save(); render()"></div>
+        <div><div class="label">Baseline comparison week</div><select onchange="state.baselineWeek=Number(this.value); save(); render()">${weekOptions(state.baselineWeek)}</select></div>
+      </div>
+    </div>
+    <div class="danger-zone" style="margin-top:14px">
+      <h3 style="margin-top:0">Danger zone</h3>
+      <div class="muted">This deletes all saved weeks and workouts.</div>
+      <div class="row" style="margin-top:12px"><button class="btn-red" onclick="safeReset()">Reset all app data</button></div>
+    </div>`;
+}
+function render(){
+  const app=document.getElementById("app");
+  const current=getTraining();
+  app.innerHTML=`
+    <div class="topbar">
+      <div class="brand">
+        <div><div class="title">${escapeHtml(state.appName)}</div><div class="subtitle">Workout log · dark mode · weekly progress</div></div>
+        <button class="week-chip" onclick="go('workout')">Week ${state.currentWeek}</button>
+      </div>
+      <div class="nav">
+        <button class="${state.currentScreen==='dashboard'?'active':''}" onclick="go('dashboard')">Dashboard</button>
+        <button class="${state.currentScreen==='workout'?'active':''}" onclick="go('workout')">Workout</button>
+        <button class="${state.currentScreen==='history'?'active':''}" onclick="go('history')">History</button>
+        <button class="${state.currentScreen==='settings'?'active':''}" onclick="go('settings')">Settings</button>
+      </div>
+    </div>
+    <div class="screen ${state.currentScreen==='dashboard'?'active':''}">${renderDashboard()}</div>
+    <div class="screen ${state.currentScreen==='workout'?'active':''}">${renderWorkout()}</div>
+    <div class="screen ${state.currentScreen==='history'?'active':''}">${renderHistory()}</div>
+    <div class="screen ${state.currentScreen==='settings'?'active':''}">${renderSettings()}</div>
+    <div class="footer-note">Current timer: ${formatTime(current.timerState.remainingSec)} · Saved locally on this device</div>`;
+}
+setInterval(()=>{
+  const tr=getTraining();
+  if(!tr.timerState.running) return;
+  if(tr.timerState.remainingSec>0) tr.timerState.remainingSec -= 1;
+  else tr.timerState.running=false;
+  save();
+  if(state.currentScreen==='workout') render();
+},1000);
+render();
+</script>
 </body>
 </html>
