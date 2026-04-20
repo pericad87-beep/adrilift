@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AdriLift</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body style="background:black;color:white;font-family:sans-serif;padding:20px;">
+
+<h1>AdriLift</h1>
+
+<h2 id="week">Week 1</h2>
+
+<h2>Timer</h2>
+<div id="timer" style="font-size:30px;">60:00</div>
+<button onclick="start()">Start Training</button>
+
+<h2>Exercises</h2>
+<div id="exercises"></div>
+
+<button onclick="addExercise()">+ Add Exercise</button>
+
+<br><br>
+<button onclick="finish()">Finish Workout</button>
+
+<br><br>
+<button onclick="reset()" style="background:red;color:white;">RESET</button>
+
+<script>
+let time = 3600;
+let running = false;
+let week = localStorage.getItem("week") || 1;
+
+document.getElementById("week").innerText = "Week " + week;
+
+function start() {
+  running = true;
+}
+
+setInterval(() => {
+  if (!running) return;
+  if (time > 0) time--;
+  let m = Math.floor(time/60);
+  let s = time % 60;
+  document.getElementById("timer").innerText =
+    m + ":" + (s<10?"0"+s:s);
+}, 1000);
+
+function addExercise(){
+  let div = document.createElement("div");
+
+  div.innerHTML = `
+    <input placeholder="Exercise name"><br>
+    <div class="sets"></div>
+    <button onclick="addSet(this)">+ Add Set</button>
+    <hr>
+  `;
+
+  document.getElementById("exercises").appendChild(div);
+}
+
+function addSet(btn){
+  let parent = btn.parentElement;
+  let setsDiv = parent.querySelector(".sets");
+
+  let set = document.createElement("div");
+
+  set.innerHTML = `
+    <input placeholder="Reps">
+    <input placeholder="KG">
+    <select>
+      <option value="">-</option>
+      <option value="red">Hard</option>
+      <option value="orange">Good</option>
+      <option value="green">Easy</option>
+    </select>
+  `;
+
+  setsDiv.appendChild(set);
+}
+
+function finish(){
+  localStorage.setItem("week", ++week);
+  alert("Workout saved ✅");
+  location.reload();
+}
+
+function reset(){
+  if(confirm("Are you sure?")){
+    localStorage.clear();
+    location.reload();
+  }
+}
+</script>
+
+</body>
+</html>
