@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#070a10" />
+  <title>AdriLift</title>
+  <style>
+    :root{
+      --bg:#070a10; --bg2:#0b111a; --card:#101824; --card2:#141f2d;
+      --text:#f4f7fb; --muted:#9caec3; --muted2:#6d7f95; --line:rgba(255,255,255,.08);
+      --accent:#62a7ff; --accent2:#8b5cf6; --green:#22c55e; --orange:#f59e0b; --red:#ef4444; --cyan:#22d3ee;
+      --shadow:0 18px 55px rgba(0,0,0,.42); --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; padding:0; min-height:100vh; color:var(--text);
+      background:
+        radial-gradient(circle at 18% 0%, rgba(98,167,255,.18), transparent 30%),
+        radial-gradient(circle at 90% 5%, rgba(139,92,246,.18), transparent 28%),
+        linear-gradient(180deg,#05070b,#0a1018 45%,#070a10);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    body:before{
+      content:""; position:fixed; inset:0; pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size:36px 36px;
+      mask-image:linear-gradient(180deg,rgba(0,0,0,.75),transparent 70%);
+    }
+    .app{max-width:1080px;margin:0 auto;padding:14px 14px 120px}
+    .topbar{
+      position:sticky; top:0; z-index:50; margin:-14px -14px 16px; padding:14px;
+      backdrop-filter:blur(18px); background:rgba(5,8,13,.76); border-bottom:1px solid var(--line);
+    }
+    .brand{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .logo-wrap{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:48px;height:48px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:grid;place-items:center;box-shadow:0 14px 35px rgba(98,167,255,.22);font-size:24px
+    }
+    .title{font-size:31px;font-weight:950;letter-spacing:-.5px}
+    .subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+    .chip{
+      border:1px solid var(--line);border-radius:999px;padding:10px 13px;font-weight:900;color:white;
+      background:linear-gradient(135deg,rgba(98,167,255,.20),rgba(139,92,246,.18));white-space:nowrap
+    }
+    .nav{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+    .nav button{
+      border:1px solid transparent;background:rgba(18,28,42,.78);color:var(--muted);
+      padding:12px 8px;border-radius:16px;font-weight:950;cursor:pointer
+    }
+    .nav button.active{
+      color:white;background:linear-gradient(180deg,rgba(98,167,255,.22),rgba(139,92,246,.14));
+      border-color:rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)
+    }
+    .screen{display:none}.screen.active{display:block}
+    .hero{
+      position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:32px;padding:20px;
+      box-shadow:var(--shadow);
+      background:
+        radial-gradient(circle at top left,rgba(98,167,255,.25),transparent 35%),
+        radial-gradient(circle at bottom right,rgba(139,92,246,.22),transparent 30%),
+        linear-gradient(180deg,rgba(20,31,45,.94),rgba(12,18,27,.94));
+      margin-bottom:14px
+    }
+    .hero:after{content:"";position:absolute;right:-70px;top:-70px;width:190px;height:190px;border-radius:999px;background:rgba(255,255,255,.05)}
+    .hero-title{font-size:28px;font-weight:950;letter-spacing:-.6px;position:relative}
+    .hero-text{font-size:14px;line-height:1.55;color:var(--muted);margin-top:8px;position:relative;max-width:780px}
+    .card{
+      background:linear-gradient(180deg,rgba(16,24,36,.96),rgba(13,20,31,.96));
+      border:1px solid rgba(255,255,255,.075);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)
+    }
+    .grid{display:grid;gap:14px}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}
+    @media(max-width:760px){.grid.two,.grid.three{grid-template-columns:1fr}}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row.space{justify-content:space-between}
+    .stack{display:flex;flex-direction:column;gap:10px}.muted{color:var(--muted)}.tiny{font-size:12px}.small{font-size:13px}
+    h3{margin:0 0 10px;font-size:18px} h4{margin:0}
+    .label{font-size:12px;color:var(--muted);font-weight:950;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+    input,select,textarea{
+      width:100%;background:#0b1119;color:var(--text);border:1px solid rgba(255,255,255,.09);
+      border-radius:15px;padding:12px;outline:none;font-size:14px
+    }
+    textarea{min-height:88px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(98,167,255,.65);box-shadow:0 0 0 3px rgba(98,167,255,.10)}
+    button{border:none;border-radius:15px;padding:12px 14px;font-weight:950;cursor:pointer;transition:transform .12s ease,opacity .12s ease}
+    button:active{transform:scale(.98)}
+    .btn{background:#1d2938;color:white}.btn-outline{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.11)}
+    .btn-accent{background:linear-gradient(135deg,var(--accent),#4f8bf0);color:white}
+    .btn-purple{background:linear-gradient(135deg,var(--accent2),#6d4de8);color:white}
+    .btn-green{background:linear-gradient(135deg,var(--green),#16a34a);color:white}
+    .btn-orange{background:linear-gradient(135deg,var(--orange),#d97706);color:white}
+    .btn-red{background:linear-gradient(135deg,var(--red),#dc2626);color:white}.btn-small{padding:8px 10px;border-radius:12px;font-size:12px}
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:950;
+      color:var(--muted);background:rgba(10,15,23,.84);border:1px solid rgba(255,255,255,.09)
+    }
+    .pill-green{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.28);color:#baf7ce}
+    .pill-orange{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.28);color:#ffe1ad}
+    .pill-blue{background:rgba(98,167,255,.12);border-color:rgba(98,167,255,.28);color:#c9e3ff}
+    .pill-red{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.28);color:#ffc4c4}
+    .progress{height:11px;border-radius:999px;background:#0a1017;border:1px solid rgba(255,255,255,.08);overflow:hidden}
+    .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--cyan))}
+    .workout-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    @media(max-width:900px){.workout-cards{grid-template-columns:repeat(2,1fr)}} @media(max-width:520px){.workout-cards{grid-template-columns:1fr}}
+    .workout-card{
+      padding:15px;border-radius:22px;border:1px solid rgba(255,255,255,.075);
+      background:radial-gradient(circle at 0% 0%,rgba(98,167,255,.10),transparent 38%),linear-gradient(180deg,#111a27,#0d141e);
+      min-height:160px
+    }
+    .workout-card.active{outline:2px solid rgba(98,167,255,.45)}.workout-card.done{border-color:rgba(34,197,94,.30)}
+    .big-number{font-size:38px;font-weight:950;letter-spacing:-1px}.metric{padding:14px;border-radius:20px;background:rgba(9,14,22,.6);border:1px solid rgba(255,255,255,.07)}
+    .exercise{
+      border:1px solid rgba(255,255,255,.075);background:radial-gradient(circle at top right,rgba(139,92,246,.08),transparent 35%),linear-gradient(180deg,#111a26,#0d141e);
+      border-radius:25px;padding:15px;margin-top:14px;box-shadow:0 12px 35px rgba(0,0,0,.25)
+    }
+    .exercise-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+    .exercise-title{font-size:18px;font-weight:950}.focus{color:#cfe6ff;font-size:13px;margin-top:3px}
+    .set-row{display:grid;grid-template-columns:74px 96px 96px 1fr auto;gap:8px;align-items:start;margin-bottom:8px}
+    @media(max-width:860px){.set-row{grid-template-columns:64px 1fr 1fr}.set-target{grid-column:1/-1}.set-actions{grid-column:1/-1}}
+    .set-label{padding:11px 8px;border-radius:14px;background:rgba(8,13,20,.76);border:1px solid rgba(255,255,255,.08);text-align:center;font-weight:950}
+    .set-label.top{background:rgba(98,167,255,.13);border-color:rgba(98,167,255,.26);color:#d8ecff}
+    .set-label.back{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.24);color:#eadcff}
+    .set-target{padding:10px 11px;border-radius:14px;background:rgba(8,13,20,.56);border:1px solid rgba(255,255,255,.07)}
+    .diff{font-size:12px;color:var(--muted2);margin-top:3px}.divider{height:1px;background:rgba(255,255,255,.07);margin:13px 0}
+    .footer-note{text-align:center;color:var(--muted2);font-size:12px;margin-top:18px}
+    .danger-zone{border:1px solid rgba(239,68,68,.26);background:rgba(127,29,29,.10);border-radius:20px;padding:14px}
+    .hint{font-size:12px;color:var(--muted);line-height:1.45}.empty{padding:22px;text-align:center;color:var(--muted)}
+  </style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script>
+const STORAGE_KEY = "adrilift_rotation_v3";
+
+const DEFAULT_TRAININGS = [
+  { id:1, name:"Grudi / Biceps", short:"Chest + Biceps", exercises:[
+    {name:"Incline Smith Press", focus:"gornja grudi + snaga", setType:"top-backoff", targetMin:6,targetMax:8,backoffMin:8,backoffMax:10,backoffPercent:12,sets:4,note:"Spuštaj ka gornjem delu grudi. Laktovi blago u stranu. Top set je najteža serija, back off je lakši i kontrolisan."},
+    {name:"Machine Chest Press (ravno)", focus:"srednja grudi", setType:"normal", targetMin:8,targetMax:10,sets:3,note:"Pun opseg pokreta. Ne zaključavaj laktove na vrhu."},
+    {name:"Incline Fly", focus:"gornja grudi – istezanje", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Kontrola i duboko istezanje. Ne savijaj previše laktove."},
+    {name:"Preacher Curl", focus:"biceps", setType:"normal", targetMin:8,targetMax:10,sets:3,note:"Spor negativ. Lakat fiksiran."},
+    {name:"Hammer Curl", focus:"brachialis + podlaktica", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Neutral hvat, bez ljuljanja."}
+  ]},
+  { id:2, name:"Leđa / Triceps", short:"Back A + Triceps", exercises:[
+    {name:"Barbell Row", focus:"gornja leđa – debljina", setType:"top-backoff", targetMin:6,targetMax:8,backoffMin:8,backoffMax:10,backoffPercent:12,sets:4,note:"Vučeš šipku ka donjem stomaku. Hvat običan overhand, malo šire od ramena. Laktovi blago u stranu. Skupljaj lopatice."},
+    {name:"Lat Pulldown (uski/neutral)", focus:"lat – širina", setType:"normal", targetMin:8,targetMax:10,sets:3,note:"Vučeš ka gornjim grudima. Laktovi uz telo. Ne cimaj leđima."},
+    {name:"Chest Supported Row", focus:"gornja leđa", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Vučeš ka sredini stomaka. Grudi naslonjene, bez cimanja."},
+    {name:"Skull Crusher", focus:"triceps – duga glava", setType:"normal", targetMin:8,targetMax:10,sets:3,note:"Laktovi mirni. Spuštaj kontrolisano."},
+    {name:"Cable Pushdown", focus:"triceps", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Laktovi uz telo, pun opseg."},
+    {name:"Single Arm Cable Pushdown (neutral hvat)", focus:"triceps – kontrola", setType:"normal", targetMin:12,targetMax:15,sets:2,note:"Jednoručno, neutral hvat. Kontrola i pun završetak pokreta."}
+  ]},
+  { id:3, name:"Ramena / Trap", short:"Shoulders", exercises:[
+    {name:"Lateral Raise Machine", focus:"side delt – širina ramena", setType:"normal", targetMin:12,targetMax:15,sets:4,note:"Prioritet vežba. Bez zamaha, kontrola na vrhu."},
+    {name:"Shoulder Press Machine", focus:"prednje rame + side delt", setType:"top-backoff", targetMin:6,targetMax:8,backoffMin:8,backoffMax:10,backoffPercent:10,sets:4,note:"Ne spuštaj preduboko ako rame smeta. Top set težak, back off kontrola."},
+    {name:"Face Pull", focus:"zadnje rame", setType:"normal", targetMin:12,targetMax:15,sets:3,note:"Povlači ka licu, laktovi visoko."},
+    {name:"Cable Lateral Raise", focus:"side delt izolacija", setType:"normal", targetMin:12,targetMax:15,sets:3,note:"Jednoručno ili obema rukama. Sporo i bez trzanja."},
+    {name:"Shrugs", focus:"trapez", setType:"normal", targetMin:10,targetMax:15,sets:3,note:"Samo gore-dole, bez kruženja. Zadrži sekundu gore."}
+  ]},
+  { id:4, name:"Grudi / Leđa", short:"Chest + Back B", exercises:[
+    {name:"Incline Dumbbell Press", focus:"gornja grudi", setType:"top-backoff", targetMin:6,targetMax:8,backoffMin:8,backoffMax:10,backoffPercent:12,sets:4,note:"Duboko istezanje i kontrola. Ne sudaraj bučice na vrhu."},
+    {name:"T-Bar Row (uski hvat)", focus:"mix – gornja leđa + lat", setType:"top-backoff", targetMin:6,targetMax:8,backoffMin:8,backoffMax:10,backoffPercent:12,sets:4,note:"Vučeš ka stomaku. Laktovi uz telo. Kontrola, bez cimanja."},
+    {name:"Incline Machine Press", focus:"gornja grudi", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Spor negativ, jak stisak u gornjoj poziciji."},
+    {name:"Seated Cable Row (lat varijanta)", focus:"lat", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Vučeš ka donjem stomaku/kukovima. Laktovi uz telo."},
+    {name:"Flat Machine Fly", focus:"srednja grudi – istezanje", setType:"normal", targetMin:12,targetMax:15,sets:3,note:"Istezanje dole, kontrola gore."},
+    {name:"Wide Grip Cable Row", focus:"gornja leđa", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Vučeš ka grudima. Širok hvat, laktovi šire. Skupljaj lopatice."}
+  ]},
+  { id:5, name:"Noge + Superset", short:"Legs + Pump", exercises:[
+    {name:"Squat / Hack Squat", focus:"glavna vežba za noge", setType:"top-backoff", targetMin:6,targetMax:8,backoffMin:8,backoffMax:10,backoffPercent:12,sets:4,note:"Top set težak, back off kontrolisan. Dubina koliko forma dozvoljava."},
+    {name:"Leg Press", focus:"cela noga – kvadriceps dominant", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Stopala stabilna, kontrola i puna dubina."},
+    {name:"Leg Curl", focus:"zadnja loža", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Spor negativ. Ne diži kukove."},
+    {name:"Leg Extension", focus:"kvadriceps", setType:"normal", targetMin:12,targetMax:15,sets:3,note:"Zadrži gore sekundu."},
+    {name:"Lateral Raise", focus:"side delt – superset", setType:"normal", targetMin:12,targetMax:15,sets:3,note:"Lagano, pump. Ne ubij ramena posle nogu."},
+    {name:"Cable Curl", focus:"biceps – superset", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Kontrola i pump."},
+    {name:"Rope Pushdown", focus:"triceps – superset", setType:"normal", targetMin:10,targetMax:12,sets:3,note:"Laktovi uz telo, pun završetak."}
+  ]}
+];
+
+function uid(){return Math.random().toString(36).slice(2,10)}
+function safeNum(v){const n=Number(v);return Number.isFinite(n)?n:null}
+function roundKg(n){return Math.round(n*2)/2}
+function escapeHtml(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+function initialState(){return {appName:"AdriLift",currentScreen:"dashboard",currentTraining:1,currentCycle:1,sessions:{},settings:{autoBackoff:true}}}
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY);return raw?normalize(JSON.parse(raw)):initialState()}catch(e){return initialState()}}
+function normalize(s){const x={...initialState(),...s}; if(!x.sessions||typeof x.sessions!=="object")x.sessions={}; if(!x.settings)x.settings={autoBackoff:true}; return x}
+let state=load()
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function sessionKey(c=state.currentCycle,t=state.currentTraining){return `C${c}_T${t}`}
+function findPreviousSession(trainingId,beforeCycle=state.currentCycle){for(let c=beforeCycle-1;c>=1;c--){const s=state.sessions[`C${c}_T${trainingId}`]; if(s)return s} return null}
+function makeSet(kind,min,max,prev){return {reps:prev?.reps??"",weight:prev?.weight??"",kind,targetMin:min,targetMax:max,feeling:prev?.feeling??""}}
+function buildExercise(t,prev){
+  const ex={id:uid(),name:t.name,focus:t.focus,setType:t.setType,targetMin:t.targetMin,targetMax:t.targetMax,backoffMin:t.backoffMin||8,backoffMax:t.backoffMax||10,backoffPercent:t.backoffPercent||12,note:prev?.note||t.note,sets:[]}
+  const count=Math.min(4,t.sets||3)
+  for(let i=0;i<count;i++){
+    let kind="normal",min=ex.targetMin,max=ex.targetMax
+    if(ex.setType==="top-backoff"){kind=i===0?"top":"back";min=i===0?ex.targetMin:ex.backoffMin;max=i===0?ex.targetMax:ex.backoffMax}
+    ex.sets.push(makeSet(kind,min,max,prev?.sets?.[i]))
+  }
+  return ex
+}
+function emptySession(cycle,trainingId,prev){
+  const tr=DEFAULT_TRAININGS.find(x=>x.id===trainingId)
+  const byName={}; if(prev)prev.exercises.forEach(e=>byName[e.name]=e)
+  return {id:uid(),cycle,trainingId,trainingName:tr.name,createdAt:new Date().toISOString(),finishedAt:"",notes:"",timer:{remainingSec:3600,running:false},exercises:tr.exercises.map(e=>buildExercise(e,byName[e.name]))}
+}
+function getSession(c=state.currentCycle,t=state.currentTraining){
+  const key=sessionKey(c,t)
+  if(!state.sessions[key]){state.sessions[key]=emptySession(c,t,findPreviousSession(t,c));save()}
+  return state.sessions[key]
+}
+function allSessions(){return Object.values(state.sessions).sort((a,b)=>a.cycle!==b.cycle?a.cycle-b.cycle:a.trainingId-b.trainingId)}
+function completedInCycle(c=state.currentCycle){let n=0;for(let t=1;t<=5;t++)if(state.sessions[`C${c}_T${t}`]?.finishedAt)n++;return n}
+function progressPercent(){return completedInCycle()/5*100}
+function formatTime(sec){sec=Math.max(0,sec);const m=Math.floor(sec/60),s=sec%60;return `${m}:${String(s).padStart(2,"0")}`}
+function go(screen){state.currentScreen=screen;save();render()}
+function setTraining(id){state.currentTraining=Number(id);getSession();save();render()}
+function setCycle(c){state.currentCycle=Math.max(1,Number(c)||1);getSession();save();render()}
+function nextWorkout(){let t=state.currentTraining+1,c=state.currentCycle;if(t>5){t=1;c++}state.currentTraining=t;state.currentCycle=c;getSession();save();render()}
+function previousWorkout(){let t=state.currentTraining-1,c=state.currentCycle;if(t<1){if(c<=1)return;t=5;c--}state.currentTraining=t;state.currentCycle=c;getSession();save();render()}
+function updateSession(field,val){getSession()[field]=val;save()}
+function updateExercise(i,field,val){const ex=getSession().exercises[i];ex[field]=val; if(field==="backoffPercent")autoBackoff(i,true);save();renderSoon()}
+function updateSet(i,si,field,val){const ex=getSession().exercises[i];ex.sets[si][field]=val;if(field==="weight"&&si===0&&ex.setType==="top-backoff"&&state.settings.autoBackoff)autoBackoff(i,true);save()}
+function autoBackoff(i,overwrite=false){const ex=getSession().exercises[i];if(ex.setType!=="top-backoff")return;const top=safeNum(ex.sets[0].weight);if(top===null)return;const pct=safeNum(ex.backoffPercent)??12;const back=String(roundKg(top*(1-pct/100)));for(let si=1;si<ex.sets.length;si++){if(overwrite||ex.sets[si].weight==="")ex.sets[si].weight=back}}
+function addSet(i){const ex=getSession().exercises[i];if(ex.sets.length>=4){alert("Maximum is 4 sets.");return}let kind="normal",min=ex.targetMin,max=ex.targetMax;if(ex.setType==="top-backoff"){kind=ex.sets.length===0?"top":"back";min=kind==="top"?ex.targetMin:ex.backoffMin;max=kind==="top"?ex.targetMax:ex.backoffMax}ex.sets.push({reps:"",weight:"",kind,targetMin:min,targetMax:max,feeling:""});autoBackoff(i,false);save();render()}
+function removeSet(i,si){const ex=getSession().exercises[i];if(ex.sets.length<=1)return;ex.sets.splice(si,1);save();render()}
+function finishWorkout(){const s=getSession();s.timer.running=false;s.finishedAt=new Date().toISOString();save();alert("Workout saved ✅");render()}
+function startTimer(){getSession().timer.running=true;save();render()}
+function pauseTimer(){getSession().timer.running=false;save();render()}
+function resetTimer(){const s=getSession();s.timer.running=false;s.timer.remainingSec=3600;save();render()}
+function resetAll(){const typed=prompt("Type RESET to delete all app data."); if(typed==="RESET"){localStorage.removeItem(STORAGE_KEY);state=initialState();render()}}
+let renderTimeout=null; function renderSoon(){clearTimeout(renderTimeout);renderTimeout=setTimeout(render,50)}
+function diffFromPrev(exName,setIndex,field,current){
+  const prev=findPreviousSession(state.currentTraining,state.currentCycle); if(!prev)return "—"
+  const ex=prev.exercises.find(e=>e.name===exName); const val=ex?.sets?.[setIndex]?.[field]
+  const a=safeNum(current),b=safeNum(val); if(a===null||b===null)return "—"; const d=a-b; return `${d>0?"+":""}${d}${field==="weight"?" kg":" reps"}`
+}
+function renderDashboard(){
+  const cards=DEFAULT_TRAININGS.map(t=>{
+    const s=state.sessions[`C${state.currentCycle}_T${t.id}`]; const done=!!s?.finishedAt; const active=state.currentTraining===t.id
+    return `<div class="workout-card ${done?'done':''} ${active?'active':''}">
+      <div class="row space"><div class="badge pill-blue">T${t.id}</div><div class="badge ${done?'pill-green':'pill-orange'}">${done?'Done':'Pending'}</div></div>
+      <div style="font-size:19px;font-weight:950;margin-top:14px">${escapeHtml(t.name)}</div>
+      <div class="muted small" style="margin-top:6px">${escapeHtml(t.short)}</div>
+      <button class="btn-accent" style="width:100%;margin-top:14px" onclick="setTraining(${t.id});go('workout')">Open</button>
+    </div>`
+  }).join("")
+  return `<div class="hero">
+    <div class="hero-title">5-training rotation, built for your real split.</div>
+    <div class="hero-text">Tracks cycles of 5 workouts instead of fixed weeks. When you return to the same training, the last values are prefilled so you only edit what changed.</div>
+  </div>
+  <div class="grid three">
+    <div class="metric"><div class="muted tiny">Current cycle</div><div class="big-number">${state.currentCycle}</div></div>
+    <div class="metric"><div class="muted tiny">Current training</div><div class="big-number">T${state.currentTraining}</div></div>
+    <div class="metric"><div class="muted tiny">Completed</div><div class="big-number">${completedInCycle()}/5</div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="row space"><h3>Cycle progress</h3><div class="badge">${Math.round(progressPercent())}%</div></div>
+    <div class="progress"><div style="width:${progressPercent()}%"></div></div>
+  </div>
+  <div class="workout-cards" style="margin-top:14px">${cards}</div>`
+}
+function renderSet(ex,i,set,si){
+  const cls=set.kind==="top"?"top":set.kind==="back"?"back":""
+  const label=set.kind==="top"?"Top":set.kind==="back"?"Back":`#${si+1}`
+  return `<div class="set-row">
+    <div class="set-label ${cls}">${label}</div>
+    <div><input type="number" inputmode="numeric" placeholder="Reps" value="${set.reps}" oninput="updateSet(${i},${si},'reps',this.value)"><div class="diff">prev: ${diffFromPrev(ex.name,si,'reps',set.reps)}</div></div>
+    <div><input type="number" inputmode="decimal" placeholder="KG" value="${set.weight}" oninput="updateSet(${i},${si},'weight',this.value)"><div class="diff">prev: ${diffFromPrev(ex.name,si,'weight',set.weight)}</div></div>
+    <div class="set-target"><b>Target:</b> ${set.targetMin}-${set.targetMax} reps ${set.kind==="back" ? "· Back off" : set.kind==="top" ? "· Heavy" : ""}</div>
+    <div class="set-actions row" style="justify-content:flex-end">
+      <button class="btn-small ${set.feeling==='hard'?'btn-red':'btn-outline'}" onclick="updateSet(${i},${si},'feeling','hard');render()">Hard</button>
+      <button class="btn-small ${set.feeling==='good'?'btn-orange':'btn-outline'}" onclick="updateSet(${i},${si},'feeling','good');render()">OK</button>
+      <button class="btn-small ${set.feeling==='easy'?'btn-green':'btn-outline'}" onclick="updateSet(${i},${si},'feeling','easy');render()">Easy</button>
+      <button class="btn-outline btn-small" onclick="removeSet(${i},${si})">Remove</button>
+    </div>
+  </div>`
+}
+function renderWorkout(){
+  const s=getSession()
+  const cycleOpts=Array.from({length:Math.max(12,state.currentCycle+3)},(_,i)=>i+1).map(c=>`<option value="${c}" ${c===state.currentCycle?'selected':''}>Cycle ${c}</option>`).join("")
+  const trainingOpts=DEFAULT_TRAININGS.map(t=>`<option value="${t.id}" ${t.id===state.currentTraining?'selected':''}>T${t.id} - ${t.name}</option>`).join("")
+  return `<div class="card">
+    <div class="grid two">
+      <div><div class="label">Cycle</div><select onchange="setCycle(this.value)">${cycleOpts}</select></div>
+      <div><div class="label">Training</div><select onchange="setTraining(this.value)">${trainingOpts}</select></div>
+    </div>
+    <div class="row space" style="margin-top:14px">
+      <div><div class="tiny muted">Current session</div><div style="font-size:24px;font-weight:950">Cycle ${state.currentCycle} · Training ${state.currentTraining}</div><div class="muted small">${escapeHtml(s.trainingName)}</div></div>
+      <div class="badge ${s.finishedAt?'pill-green':'pill-orange'}">${s.finishedAt?'Finished':'In progress'}</div>
+    </div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="metric"><div class="label">Timer</div><div class="big-number">${formatTime(s.timer.remainingSec)}</div><div class="row" style="margin-top:12px"><button class="btn-green" onclick="startTimer()">Start</button><button class="btn-orange" onclick="pauseTimer()">Pause</button><button class="btn-outline" onclick="resetTimer()">Reset</button></div></div>
+      <div><div class="label">Session notes</div><textarea oninput="updateSession('notes',this.value)" placeholder="How did this workout feel?">${escapeHtml(s.notes||"")}</textarea></div>
+    </div>
+    <div class="row space" style="margin-top:14px">
+      <div class="row"><button class="btn-outline" onclick="previousWorkout()">Previous</button><button class="btn-purple" onclick="nextWorkout()">Next workout</button></div>
+      <button class="btn-green" onclick="finishWorkout()">Finish Workout</button>
+    </div>
+  </div>
+  ${s.exercises.map((ex,i)=>`<div class="exercise">
+    <div class="exercise-head">
+      <div><div class="exercise-title">${i+1}. ${escapeHtml(ex.name)}</div><div class="focus">Focus: ${escapeHtml(ex.focus)}</div></div>
+      <div class="row">
+        <div class="badge ${ex.setType==='top-backoff'?'pill-blue':''}">${ex.setType==='top-backoff'?'Top Set + Back Off':'Normal'}</div>
+        <button class="btn-outline btn-small" onclick="addSet(${i})">+ Set</button>
+      </div>
+    </div>
+    <div class="grid two">
+      <div><div class="label">Rep range</div><div class="row"><input type="number" value="${ex.targetMin}" onchange="updateExercise(${i},'targetMin',Number(this.value))"><input type="number" value="${ex.targetMax}" onchange="updateExercise(${i},'targetMax',Number(this.value))"></div></div>
+      <div><div class="label">Back off % ${ex.setType==='top-backoff'?'':'(not used)'}</div><input type="number" value="${ex.backoffPercent}" onchange="updateExercise(${i},'backoffPercent',Number(this.value))" ${ex.setType!=='top-backoff'?'disabled':''}></div>
+    </div>
+    <div class="hint" style="margin-top:10px">${escapeHtml(ex.note)}</div>
+    <div class="divider"></div>
+    ${ex.sets.map((set,si)=>renderSet(ex,i,set,si)).join("")}
+    <div><div class="label">Exercise note</div><textarea oninput="updateExercise(${i},'note',this.value)">${escapeHtml(ex.note||"")}</textarea></div>
+  </div>`).join("")}`
+}
+function renderHistory(){
+  const sessions=allSessions()
+  return `<div class="card"><h3>History</h3><div class="muted">All saved cycles and trainings on this device.</div></div>
+  <div class="grid" style="margin-top:14px">
+    ${sessions.length?sessions.map(s=>`<div class="card">
+      <div class="row space"><div><b>Cycle ${s.cycle} · Training ${s.trainingId}</b><div class="muted small">${escapeHtml(s.trainingName)}</div></div><button class="btn-outline btn-small" onclick="setCycle(${s.cycle});setTraining(${s.trainingId});go('workout')">Open</button></div>
+      <div class="row" style="margin-top:10px"><span class="badge ${s.finishedAt?'pill-green':'pill-orange'}">${s.finishedAt?'Finished':'Not finished'}</span><span class="badge">${new Date(s.createdAt).toLocaleDateString()}</span></div>
+    </div>`).join(""):`<div class="empty card">No history yet.</div>`}
+  </div>`
+}
+function renderSettings(){
+  return `<div class="card">
+    <h3>Settings</h3>
+    <div class="grid two">
+      <div><div class="label">App name</div><input value="${escapeHtml(state.appName)}" oninput="state.appName=this.value;save();renderSoon()"></div>
+      <div><div class="label">Auto calculate back off</div><select onchange="state.settings.autoBackoff=this.value==='true';save();render()"><option value="true" ${state.settings.autoBackoff?'selected':''}>ON</option><option value="false" ${!state.settings.autoBackoff?'selected':''}>OFF</option></select></div>
+    </div>
+    <div class="hint" style="margin-top:12px">Back off weights are calculated from the top set. You can still edit every field manually. Maximum is 4 sets per exercise.</div>
+  </div>
+  <div class="danger-zone" style="margin-top:14px">
+    <h3>Danger zone</h3>
+    <div class="muted">This deletes all saved cycles and workout data from this device.</div>
+    <button class="btn-red" style="margin-top:12px" onclick="resetAll()">Reset all data</button>
+  </div>`
+}
+function render(){
+  const s=getSession()
+  document.getElementById("app").innerHTML=`<div class="topbar">
+    <div class="brand">
+      <div class="logo-wrap"><div class="logo">🏋️</div><div><div class="title">${escapeHtml(state.appName)}</div><div class="subtitle">Rotation tracker · top set + back off · max 4 sets</div></div></div>
+      <button class="chip" onclick="go('workout')">C${state.currentCycle} · T${state.currentTraining}</button>
+    </div>
+    <div class="nav"><button class="${state.currentScreen==='dashboard'?'active':''}" onclick="go('dashboard')">Dashboard</button><button class="${state.currentScreen==='workout'?'active':''}" onclick="go('workout')">Workout</button><button class="${state.currentScreen==='history'?'active':''}" onclick="go('history')">History</button><button class="${state.currentScreen==='settings'?'active':''}" onclick="go('settings')">Settings</button></div>
+  </div>
+  <div class="screen ${state.currentScreen==='dashboard'?'active':''}">${renderDashboard()}</div>
+  <div class="screen ${state.currentScreen==='workout'?'active':''}">${renderWorkout()}</div>
+  <div class="screen ${state.currentScreen==='history'?'active':''}">${renderHistory()}</div>
+  <div class="screen ${state.currentScreen==='settings'?'active':''}">${renderSettings()}</div>
+  <div class="footer-note">Current: Cycle ${state.currentCycle} · Training ${state.currentTraining} · Timer ${formatTime(s.timer.remainingSec)} · Saved locally</div>`
+}
+setInterval(()=>{const s=getSession(); if(!s.timer.running)return; if(s.timer.remainingSec>0)s.timer.remainingSec--; else s.timer.running=false; save(); if(state.currentScreen==="workout")render()},1000)
+render()
+</script>
+</body>
+</html>
